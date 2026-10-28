@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Auditoría NIC 20: subvenciones del gobierno</title>
+<style>
+  /* Diseño: una columna de 680 px; tarjetas con borde fino; verde agro como acento. */
+  :root {
+    --fondo: #f3f5f4;
+    --superficie: #ffffff;
+    --superficie-2: #eef2f0;
+    --texto: #121816;
+    --texto-suave: #56625d;
+    --borde: #d7dfdb;
+    --acento: #0f6e5a;
+    --acento-suave: #e1f0eb;
+    --sobre-acento: #ffffff;
+    --bien: #157a3c;
+    --bien-fondo: #e5f4ea;
+    --mal: #b42318;
+    --mal-fondo: #fbe9e7;
+    --enfoque: #0f6e5a;
+    --sombra: 0 1px 2px rgba(16, 40, 32, 0.06), 0 6px 20px rgba(16, 40, 32, 0.06);
+    --cabecera: linear-gradient(140deg, #dcefe8 0%, #ffffff 65%);
+    --oro: #b7891b; --oro-fondo: #fbf1d6;
+    --plata: #6b7680; --plata-fondo: #eceff1;
+    --bronce: #a4602e; --bronce-fondo: #f6e6d8;
+    --radio: 16px;
+    --radio-sm: 10px;
+    --fuente: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --fondo: #0d1311;
+      --superficie: #151d1a;
+      --superficie-2: #1c2622;
+      --texto: #e8eeeb;
+      --texto-suave: #9fb0a9;
+      --borde: #2a3832;
+      --acento: #4cc9a4;
+      --acento-suave: #173a30;
+      --sobre-acento: #06140f;
+      --bien: #6fd896;
+      --bien-fondo: #15301f;
+      --mal: #ff8a7d;
+      --mal-fondo: #3a1a17;
+      --enfoque: #4cc9a4;
+      --sombra: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25);
+      --cabecera: linear-gradient(140deg, #173a30 0%, #151d1a 65%);
+      --oro: #f0c75e; --oro-fondo: #3a3016;
+      --plata: #c3ccd3; --plata-fondo: #2a3136;
+      --bronce: #e3a274; --bronce-fondo: #3a2719;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --fondo: #0d1311;
+    --superficie: #151d1a;
+    --superficie-2: #1c2622;
+    --texto: #e8eeeb;
+    --texto-suave: #9fb0a9;
+    --borde: #2a3832;
+    --acento: #4cc9a4;
+    --acento-suave: #173a30;
+    --sobre-acento: #06140f;
+    --bien: #6fd896;
+    --bien-fondo: #15301f;
+    --mal: #ff8a7d;
+    --mal-fondo: #3a1a17;
+    --enfoque: #4cc9a4;
+    --sombra: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25);
+    --cabecera: linear-gradient(140deg, #173a30 0%, #151d1a 65%);
+    --oro: #f0c75e; --oro-fondo: #3a3016;
+    --plata: #c3ccd3; --plata-fondo: #2a3136;
+    --bronce: #e3a274; --bronce-fondo: #3a2719;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: var(--fuente);
+    font-size: 1rem;
+    line-height: 1.55;
+    padding-block: max(20px, env(safe-area-inset-top, 0px)) max(32px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  main { max-width: 680px; margin: 0 auto; display: grid; gap: 16px; }
+  h1, h2, h3 { line-height: 1.2; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(1.6rem, 5vw, 2.1rem); font-weight: 750; letter-spacing: -0.02em; }
+  h2 { font-size: 1.15rem; font-weight: 700; }
+  h3 { font-size: 1.05rem; font-weight: 700; }
+  p { margin: 0; }
+  .pantalla { display: grid; gap: 16px; }
+  .pantalla[hidden], [hidden] { display: none !important; }
+  .suave { color: var(--texto-suave); }
+  .pequeno { font-size: 0.875rem; }
+  .eyebrow {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--acento);
+  }
+  .tarjeta {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    padding: 20px;
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+    box-shadow: var(--sombra);
+  }
+  .tarjeta > *, .pantalla > * { min-width: 0; }
+  .hero { gap: 12px; background: var(--cabecera); padding: 24px 20px; }
+  .pantalla:not([hidden]) { animation: entrar 0.28s ease both; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes marcar { 0% { transform: scale(1); } 40% { transform: scale(1.015); } 100% { transform: scale(1); } }
+  #retro:not([hidden]) { animation: entrar 0.25s ease both; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--superficie-2); border: 1px solid var(--borde);
+    border-radius: 999px; padding: 4px 12px; font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .chip strong { font-weight: 700; }
+  .niveles { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; counter-reset: n; }
+  .niveles li { display: flex; gap: 10px; align-items: baseline; }
+  .niveles li::before {
+    counter-increment: n; content: counter(n);
+    flex: none; width: 1.6em; height: 1.6em; border-radius: 50%;
+    display: inline-grid; place-items: center;
+    background: var(--acento-suave); color: var(--acento); font-size: 0.8rem; font-weight: 700;
+  }
+  label { font-weight: 600; font-size: 0.95rem; }
+  .campo { display: grid; gap: 6px; }
+  input[type="text"] {
+    font: inherit; color: var(--texto); background: var(--superficie);
+    border: 1px solid var(--borde); border-radius: var(--radio-sm);
+    padding: 12px 14px; min-height: 48px; width: 100%;
+  }
+  input[type="text"]:focus-visible { border-color: var(--acento); }
+  .error { color: var(--mal); font-size: 0.9rem; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .primario {
+    background: var(--acento); color: var(--sobre-acento);
+    border: 1px solid var(--acento); border-radius: var(--radio-sm);
+    padding: 12px 22px; min-height: 48px; font-weight: 700;
+    transition: filter 0.15s ease, transform 0.05s ease;
+  }
+  .primario:hover { filter: brightness(1.08); }
+  .primario:active { transform: translateY(1px); }
+  .secundario {
+    background: transparent; color: var(--acento);
+    border: 1px solid var(--borde); border-radius: var(--radio-sm);
+    padding: 10px 18px; min-height: 44px; font-weight: 600;
+  }
+  .acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+  :focus { outline: none; }
+  :focus-visible { outline: 3px solid var(--enfoque); outline-offset: 2px; }
+  h1:focus-visible, h2:focus-visible, h3:focus-visible { outline-offset: 4px; border-radius: 4px; }
+
+  /* Barra del caso */
+  .estado { display: grid; gap: 10px; }
+  .fila { display: flex; justify-content: space-between; align-items: center; gap: 8px 12px; flex-wrap: wrap; }
+  .progreso {
+    height: 6px; border-radius: 999px; background: var(--superficie-2); overflow: hidden;
+    border: 1px solid var(--borde);
+  }
+  .progreso > span { display: block; height: 100%; background: var(--acento); width: 0; transition: width 0.3s ease; }
+  .vidas { display: inline-flex; gap: 4px; align-items: center; }
+  .vida { width: 10px; height: 10px; border-radius: 50%; background: var(--acento); }
+  .vida.perdida { background: transparent; border: 2px solid var(--borde); }
+  .enunciado { font-size: 1.12rem; font-weight: 600; line-height: 1.45; }
+  .opciones { display: grid; gap: 10px; }
+  .opcion {
+    width: 100%; text-align: left;
+    background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio-sm);
+    padding: 14px 16px; min-height: 52px; line-height: 1.45;
+    display: grid; gap: 2px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .opcion:hover:not(:disabled) { border-color: var(--acento); background: var(--acento-suave); transform: translateY(-1px); }
+  .opcion { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); }
+  .opcion:disabled { cursor: default; color: var(--texto); }
+  .opcion.correcta { background: var(--bien-fondo); border: 2px solid var(--bien); animation: marcar 0.3s ease; }
+  .opcion.incorrecta { background: var(--mal-fondo); border: 2px solid var(--mal); animation: marcar 0.3s ease; }
+  .opcion.atenuada { color: var(--texto-suave); }
+  .etiqueta { font-weight: 700; font-size: 0.85rem; }
+  .correcta .etiqueta { color: var(--bien); }
+  .incorrecta .etiqueta { color: var(--mal); }
+  .retro.bien { border-color: var(--bien); }
+  .retro.mal { border-color: var(--mal); }
+  .retro.bien #retro-titulo { color: var(--bien); }
+  .retro.mal #retro-titulo { color: var(--mal); }
+
+  /* Tablas */
+  .tabla-contenedor {
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--borde); border-radius: var(--radio-sm);
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  .tabla-caso table { min-width: 470px; }
+  caption { text-align: left; font-weight: 700; padding: 10px 12px; }
+  th, td { padding: 9px 12px; text-align: left; vertical-align: top; border-top: 1px solid var(--borde); }
+  thead th { background: var(--superficie-2); font-size: 0.8rem; letter-spacing: 0.03em; text-transform: uppercase; color: var(--texto-suave); border-top: 0; }
+  caption + thead th { border-top: 1px solid var(--borde); }
+  tbody th { font-weight: 500; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.yo td, tr.yo th { background: var(--acento-suave); font-weight: 700; }
+  .vacio { padding: 14px; color: var(--texto-suave); }
+  .oculto {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  @media (max-width: 420px) {
+    .tabla-puntajes th, .tabla-puntajes td { padding: 8px 7px; font-size: 0.85rem; }
+    .tabla-puntajes thead th { letter-spacing: 0; }
+    .dato .valor { font-size: 1.15rem; }
+  }
+  .grande { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1; }
+  .resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 10px; }
+  .dato { background: var(--superficie-2); border-radius: var(--radio-sm); padding: 12px 14px; display: grid; gap: 4px; }
+  .dato .valor { font-size: 1.35rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+  .aviso { background: var(--acento-suave); border-radius: var(--radio-sm); padding: 10px 14px; font-weight: 600; }
+  footer { max-width: 680px; margin: 8px auto 0; font-size: 0.8rem; color: var(--texto-suave); }
+  .insignia {
+    display: inline-grid; place-items: center; min-width: 1.9em; height: 1.9em; padding: 0 6px;
+    border-radius: 999px; font-weight: 800; font-size: 0.85rem; font-variant-numeric: tabular-nums;
+  }
+  .insignia.p1 { background: var(--oro-fondo); color: var(--oro); border: 1px solid var(--oro); }
+  .insignia.p2 { background: var(--plata-fondo); color: var(--plata); border: 1px solid var(--plata); }
+  .insignia.p3 { background: var(--bronce-fondo); color: var(--bronce); border: 1px solid var(--bronce); }
+  .marcador { text-align: center; display: grid; gap: 4px; padding: 8px 0 4px; }
+  .marcador .grande { font-size: clamp(3rem, 12vw, 4.2rem); color: var(--acento); }
+  .racha { background: var(--acento-suave); border-color: var(--acento); color: var(--acento); font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- INICIO -->
+  <section id="pantalla-inicio" class="pantalla" aria-labelledby="titulo-inicio">
+    <div class="tarjeta hero">
+      <span class="eyebrow">Juego de estudio · NIC 20</span>
+      <h1 id="titulo-inicio" tabindex="-1">Auditoría NIC 20: subvenciones del gobierno</h1>
+      <p class="suave">Eres auditor de la Cooperativa Agroindustrial Altos del Cauca, una entidad ficticia, y debes decidir el tratamiento contable correcto de cada caso según la NIC 20.</p>
+      <div class="chips">
+        <span class="chip"><strong id="num-casos">15</strong> casos</span>
+        <span class="chip"><strong>5</strong> niveles</span>
+        <span class="chip"><strong>3</strong> vidas</span>
+        <span class="chip"><strong>4</strong> opciones por caso</span>
+        <span class="chip">Tu mejor puntaje: <strong id="mejor-inicio">0</strong></span>
+      </div>
+    </div>
+
+    <form class="tarjeta" id="form-inicio" novalidate>
+      <div class="campo">
+        <label for="nombre">Tu nombre</label>
+        <input type="text" id="nombre" name="nombre" maxlength="30" autocomplete="name" placeholder="Por ejemplo, Laura Gómez" aria-describedby="nombre-error">
+        <p class="error" id="nombre-error" hidden>Escribe tu nombre para aparecer en la tabla de puntajes.</p>
+      </div>
+      <p class="suave pequeno">Reglas: cada acierto vale 10 puntos más 2 por cada acierto seguido previo (máximo 20); cada error resta una de tus 3 vidas.</p>
+      <div class="acciones"><button type="submit" class="primario" id="btn-comenzar">Comenzar</button></div>
+    </form>
+
+    <div class="tarjeta">
+      <h2>Niveles</h2>
+      <ol class="niveles">
+        <li>Alcance y definiciones</li>
+        <li>Reconocimiento</li>
+        <li>Método de la renta</li>
+        <li>Presentación</li>
+        <li>Devolución y revelación</li>
+      </ol>
+    </div>
+
+    <div class="tarjeta">
+      <div class="fila">
+        <h2>Tabla de puntajes</h2>
+        <button type="button" class="secundario" id="btn-actualizar-inicio">Actualizar</button>
+      </div>
+      <p class="suave pequeno" id="tabla-inicio-nota"></p>
+      <div id="tabla-inicio"></div>
+    </div>
+  </section>
+
+  <!-- CASO -->
+  <section id="pantalla-caso" class="pantalla" aria-labelledby="titulo-caso" hidden>
+    <div class="tarjeta estado">
+      <div class="fila">
+        <span class="eyebrow" id="info-nivel"></span>
+        <span class="pequeno suave" id="info-caso"></span>
+      </div>
+      <div class="progreso" aria-hidden="true"><span id="barra-progreso"></span></div>
+      <div class="fila">
+        <span class="chip"><span id="info-vidas-texto"></span><span class="vidas" id="info-vidas" aria-hidden="true"></span></span>
+        <span class="chips">
+          <span class="chip racha" id="info-racha" hidden></span>
+          <span class="chip">Puntaje: <strong id="info-puntaje">0</strong></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2 id="titulo-caso" class="oculto" tabindex="-1"></h2>
+      <p class="enunciado" id="enunciado"></p>
+      <div class="opciones" id="opciones" role="group" aria-label="Opciones de respuesta"></div>
+    </div>
+
+    <div id="retro" class="tarjeta retro" hidden aria-live="polite">
+      <h3 id="retro-titulo" tabindex="-1"></h3>
+      <p id="retro-explicacion"></p>
+      <div id="retro-tabla"></div>
+      <div class="acciones"><button type="button" class="primario" id="btn-siguiente">Siguiente caso</button></div>
+    </div>
+  </section>
+
+  <!-- RESULTADOS -->
+  <section id="pantalla-resultados" class="pantalla" aria-labelledby="titulo-resultados" hidden>
+    <div class="tarjeta">
+      <span class="eyebrow">Resultados de la auditoría</span>
+      <h1 id="titulo-resultados" tabindex="-1"></h1>
+      <p id="res-mensaje"></p>
+      <div class="marcador" aria-hidden="true">
+        <span class="grande" id="res-grande">0</span>
+        <span class="pequeno suave">puntos</span>
+      </div>
+      <div class="resumen">
+        <div class="dato"><span class="pequeno suave">Puntaje</span><span class="valor" id="res-puntaje">0</span></div>
+        <div class="dato"><span class="pequeno suave">Aciertos</span><span class="valor" id="res-aciertos">0</span></div>
+        <div class="dato"><span class="pequeno suave">Tu mejor puntaje</span><span class="valor" id="res-mejor">0</span></div>
+      </div>
+      <p class="aviso" id="res-nuevo" hidden>Nuevo mejor puntaje.</p>
+      <div class="acciones">
+        <button type="button" class="primario" id="btn-reiniciar">Jugar de nuevo</button>
+        <button type="button" class="secundario" id="btn-inicio">Cambiar de nombre</button>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <div class="fila">
+        <h2>Tabla de puntajes</h2>
+        <button type="button" class="secundario" id="btn-actualizar-res">Actualizar</button>
+      </div>
+      <p class="suave pequeno" id="tabla-res-nota"></p>
+      <div id="tabla-res"></div>
+    </div>
+  </section>
+
+</main>
+<footer>Material de estudio basado en la NIC 20, «Contabilización de las subvenciones del gobierno e información a revelar sobre ayudas gubernamentales».</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     CONFIGURACIÓN DE LA TABLA COMPARTIDA
+     Pega aquí la URL de la aplicación web de Google Apps Script
+     (termina en /exec). Si se deja vacía, la tabla muestra solo
+     los puntajes guardados en este dispositivo.
+     ============================================================ */
+  var URL_TABLA = "https://script.google.com/macros/s/AKfycbyw0bDrlPnySqqQiLv_j0yzxxueNAeGA1BUlRFFboNYdf20nUoV4neyWvlyf1a-lmKI/exec";
+
+  var NIVELES = [
+    "Alcance y definiciones",
+    "Reconocimiento",
+    "Método de la renta",
+    "Presentación",
+    "Devolución y revelación"
+  ];
+
+  var TABLAS = {
+    T7: {
+      titulo: "Cierre del año 1",
+      cabeceras: ["Cierre del año 1", "Ingreso diferido", "Deducción del activo"],
+      filas: [
+        ["Valor en libros de la máquina", "90.000.000", "54.000.000"],
+        ["Ingreso diferido (pasivo)", "36.000.000", "—"],
+        ["Gasto por depreciación", "10.000.000", "6.000.000"],
+        ["Ingreso por subvención", "4.000.000", "—"],
+        ["Efecto neto en resultados", "(6.000.000)", "(6.000.000)"]
+      ]
+    },
+    T10: {
+      titulo: "",
+      cabeceras: ["Resultados", "Como otros ingresos", "Deducida del gasto"],
+      filas: [
+        ["Gasto de capacitación", "10.000.000", "5.000.000"],
+        ["Otros ingresos", "5.000.000", "—"],
+        ["Efecto neto", "(5.000.000)", "(5.000.000)"]
+      ]
+    },
+    T12: {
+      titulo: "Cierre del año 2",
+      cabeceras: ["Cierre del año 2", "Ingreso diferido", "Deducción del activo"],
+      filas: [
+        ["Valor en libros antes", "80.000.000", "48.000.000"],
+        ["Ajuste por la devolución", "Se aplica el saldo diferido de 32.000.000", "El activo sube a 88.000.000"],
+        ["Resultados", "Gasto de 8.000.000", "Depreciación adicional de 8.000.000"],
+        ["Valor en libros final", "80.000.000", "80.000.000"]
+      ]
+    }
+  };
+
+  /* En cada caso, la primera opción es la correcta; el orden se mezcla al mostrar. */
+  var CASOS = [
+    /* ---------- Nivel 1. Alcance y definiciones ---------- */
+    { nivel: 0,
+      enunciado: "La cooperativa obtiene una tarifa reducida del impuesto de renta por invertir en una zona rural afectada por el conflicto. ¿Cómo debe tratarse este beneficio según la NIC 20?",
+      opciones: [
+        "Queda fuera del alcance de la NIC 20, porque se materializa al calcular la ganancia fiscal",
+        "Es una subvención relacionada con los ingresos que se presenta deducida del gasto por impuesto",
+        "Es una ayuda gubernamental sin valor asignable: no se reconoce, pero se revela en las notas",
+        "Es una subvención relacionada con activos, porque está condicionada a invertir en la zona"
+      ],
+      explicacion: "La NIC 20 no se ocupa de las ayudas que se materializan al calcular la ganancia imponible o que se determinan sobre la base de las obligaciones fiscales, como las exenciones, los créditos fiscales por inversiones y las tasas impositivas reducidas (párr. 2, literal b). Ese beneficio se trata con la NIC 12. La condición de invertir no la convierte en subvención, porque no hay transferencia de recursos." },
+    { nivel: 0,
+      enunciado: "El departamento pavimenta la vía terciaria que conecta la planta de la cooperativa con la cabecera municipal. La vía la usa toda la comunidad de la vereda. ¿Qué es para la cooperativa?",
+      opciones: [
+        "No es una ayuda gubernamental para la NIC 20, porque la obra está disponible para toda la comunidad",
+        "Es una ayuda gubernamental sin valor asignable, que se revela por su naturaleza, alcance y duración",
+        "Es una subvención no monetaria relacionada con activos, medida al valor razonable de la vía",
+        "Es una subvención relacionada con los ingresos, porque reduce los costos de transporte"
+      ],
+      explicacion: "La definición de ayudas gubernamentales excluye los beneficios indirectos por actuaciones sobre las condiciones generales, como el suministro de infraestructura en áreas en desarrollo (párr. 3). El párrafo 38 lo reitera para mejoras de transporte disponibles para toda la comunidad local. Por eso no se reconoce ni se exige revelarla como ayuda." },
+
+    /* ---------- Nivel 2. Reconocimiento ---------- */
+    { nivel: 1,
+      enunciado: "El gobierno consignó $15.000.000 para que la cooperativa vincule a 30 jóvenes rurales durante un año; si no lo logra, debe devolver el dinero. Al cierre solo ha vinculado a 8 y la gerencia duda de llegar a 30. ¿Qué corresponde?",
+      opciones: [
+        "Registrar el efectivo con un pasivo y no reconocer la subvención hasta tener razonable seguridad de cumplir",
+        "Reconocer la subvención, porque el cobro ya demuestra que la entidad la recibirá",
+        "Reconocer un ingreso diferido y amortizarlo en resultados durante el año del programa",
+        "Reconocer la subvención en patrimonio hasta que se cumpla la meta de vinculación"
+      ],
+      explicacion: "Se requieren dos condiciones: razonable seguridad de cumplir las condiciones y de recibir la subvención (párr. 7). Recibir el dinero no es evidencia concluyente de que las condiciones se cumplirán (párr. 8). Mientras exista la obligación de devolverlo, el cobro se refleja como un pasivo. Amortizar un ingreso diferido sería, en la práctica, reconocer la subvención." },
+    { nivel: 1,
+      enunciado: "Un fondo estatal presta $30.000.000 a la cooperativa y se compromete a no cobrarlos si mantiene 50 empleos durante tres años. Desde el desembolso hay razonable seguridad de cumplir. ¿Cómo se trata?",
+      opciones: [
+        "Como una subvención del gobierno, porque hay razonable seguridad de cumplir los términos de la condonación",
+        "Como un pasivo financiero hasta que el fondo formalice la condonación al terminar los tres años",
+        "Como un pasivo, revelando la posible condonación como un activo contingente según la NIC 37",
+        "Como un aporte del gobierno reconocido directamente en patrimonio, sin pasar por resultados"
+      ],
+      explicacion: "Un préstamo condonable del sector público se trata como una subvención cuando existe razonable seguridad de que la entidad cumplirá los términos exigidos para la condonación (párr. 10). No hay que esperar al acto formal de condonación. La NIC 37 aplica a contingencias relacionadas con una subvención ya reconocida (párr. 11), no a esta decisión." },
+    { nivel: 1,
+      enunciado: "Un banco de fomento estatal presta $50.000.000 a la cooperativa al 0 % de interés, a dos años. Medido según la NIIF 9 con la tasa de mercado, el importe en libros inicial del préstamo es $41.300.000. ¿Cuál es el importe de la subvención?",
+      opciones: ["$8.700.000", "$50.000.000", "$41.300.000", "Nada: el préstamo se mide por el importe recibido"],
+      explicacion: "El beneficio de un préstamo a una tasa inferior a la de mercado se trata como subvención. Se mide como la diferencia entre el importe en libros inicial según la NIIF 9 y el importe recibido: 50.000.000 − 41.300.000 = $8.700.000 (párr. 10A). El préstamo se reconoce por $41.300.000 y la subvención se lleva a resultados según los costos que pretende compensar." },
+
+    /* ---------- Nivel 3. Método de la renta ---------- */
+    { nivel: 2,
+      enunciado: "El municipio cede a la cooperativa un terreno con valor razonable de $20.000.000, con la condición de construir en él una planta de secado de café con vida útil de 25 años. ¿Cómo se lleva la subvención a resultados?",
+      opciones: [
+        "$800.000 al año durante la vida útil de la planta, desde que empieza a depreciarse",
+        "$20.000.000 al recibir el terreno, porque el terreno no se deprecia",
+        "Nada mientras se conserve el terreno; se reconoce cuando el terreno se venda",
+        "$800.000 al año desde la entrega del terreno, aunque la planta no se haya construido"
+      ],
+      explicacion: "Una subvención por activos que no se deprecian se reconoce en los periodos que soportan los costos de cumplir sus obligaciones. Si el terreno está condicionado a construir un edificio, puede reconocerse a lo largo de la vida útil de ese edificio (párr. 18): 20.000.000 / 25 = $800.000 al año. Reconocerla de una vez o desde antes de construir no la asocia con esos costos (párr. 12)." },
+    { nivel: 2,
+      enunciado: "En 2026 el gobierno aprueba, sin condiciones futuras, una compensación de $12.000.000 por las pérdidas que la cooperativa sufrió en la ola invernal de 2025. ¿Cómo se reconoce?",
+      opciones: [
+        "En el resultado de 2026, periodo en que se vuelve exigible, revelando su efecto",
+        "Reexpresando 2025, porque compensa pérdidas reconocidas en ese periodo",
+        "Como ingreso diferido, a lo largo de los periodos de recuperación de la cooperativa",
+        "En otro resultado integral, porque no se relaciona con las operaciones del periodo"
+      ],
+      explicacion: "Una subvención que compensa gastos o pérdidas ya incurridos, sin costos posteriores, se reconoce en el resultado del periodo en que se vuelve exigible (párr. 20). Se revela la información necesaria para que su efecto se comprenda claramente (párr. 22). No se reexpresa el año anterior ni se difiere, porque no hay costos futuros que compensar." },
+    { nivel: 2,
+      enunciado: "El gerente propone llevar las subvenciones directamente a patrimonio, porque no se espera devolverlas y no las generó la operación. ¿Qué responde el auditor?",
+      opciones: [
+        "No es aceptable: la NIC 20 exige reconocerlas en resultados de forma sistemática, con los costos que compensan",
+        "Es aceptable: la NIC 20 permite elegir entre el método del capital y el método de la renta",
+        "Es aceptable si la política se revela y se aplica de forma uniforme a todas las subvenciones",
+        "Solo es aceptable para subvenciones no monetarias, como terrenos recibidos del gobierno"
+      ],
+      explicacion: "Los argumentos del gerente son los del método del capital (párr. 14). La NIC 20 describe ese método, pero adopta el de la renta: las subvenciones se reconocen en resultados sobre una base sistemática a lo largo de los periodos en que se reconocen los costos que pretenden compensar (párr. 12, 13 y 15). Revelar la política no corrige un tratamiento que la norma no permite." },
+
+    /* ---------- Nivel 4. Presentación ---------- */
+    { nivel: 3,
+      enunciado: "Máquina de $100.000.000, subvención de $40.000.000, vida útil de 10 años, sin valor residual. Al cierre del año 1, ¿qué afirmación sobre los dos métodos de presentación es correcta?",
+      opciones: [
+        "El efecto en resultados es igual, (6.000.000), pero el total de activos difiere en 36.000.000",
+        "La deducción del activo muestra mejor utilidad, porque su gasto por depreciación es menor",
+        "El ingreso diferido muestra mejor utilidad, porque registra además un ingreso por subvención",
+        "Ambos muestran la máquina en 54.000.000; solo cambia lo que se revela en las notas"
+      ],
+      explicacion: "Los dos métodos son aceptables (párr. 24 y 25). Con el ingreso diferido, la depreciación de 10.000.000 se compensa con 4.000.000 de ingreso (párr. 26). Con la deducción del activo, solo se deprecian 6.000.000 (párr. 27). La utilidad es la misma; cambia el balance: máquina de 90.000.000 con pasivo de 36.000.000, frente a máquina de 54.000.000 sin pasivo (90.000.000 − 54.000.000 = 36.000.000).",
+      tabla: "T7" },
+    { nivel: 3,
+      enunciado: "Con los mismos datos y el método de deducción del activo, ¿cuál es el importe en libros de la máquina al cierre del año 3?",
+      opciones: ["$42.000.000", "$70.000.000", "$48.000.000", "$28.000.000"],
+      explicacion: "La máquina queda en 100.000.000 − 40.000.000 = 60.000.000 y se deprecia 6.000.000 al año: 60.000.000 − 18.000.000 = $42.000.000 (párr. 27). $70.000.000 es el importe con el método del ingreso diferido, que además muestra un pasivo de 28.000.000; el neto, 70.000.000 − 28.000.000, también da 42.000.000. $48.000.000 corresponde al año 2." },
+    { nivel: 3,
+      enunciado: "La cooperativa recibió $5.000.000 para una capacitación que costó $10.000.000 y presenta la subvención restándola del gasto de capacitación. ¿Qué concluye el auditor?",
+      opciones: [
+        "Lo acepta; conviene revelar el efecto de la subvención sobre esa partida de gasto",
+        "Lo objeta: la NIC 20 exige presentarla como otros ingresos para no compensar partidas",
+        "Lo objeta: la deducción solo se permite para subvenciones relacionadas con activos",
+        "Lo acepta, siempre que la subvención también se presente como otros ingresos"
+      ],
+      explicacion: "Las subvenciones relacionadas con los ingresos pueden presentarse por separado o como otros ingresos, o deducidas de los gastos relacionados (párr. 29). Ambos métodos son aceptables, y suele ser conveniente revelar el efecto sobre las partidas afectadas (párr. 31). El argumento contra la compensación del párrafo 30 explica una preferencia, no una prohibición. Presentarla de las dos formas duplicaría el ingreso.",
+      tabla: "T10" },
+    { nivel: 3,
+      enunciado: "La cooperativa usa el método de deducción del activo para la máquina de $100.000.000 y la subvención de $40.000.000. ¿Cómo suelen mostrarse en el estado de flujos de efectivo?",
+      opciones: [
+        "Como partidas separadas, para mostrar la inversión bruta en activos",
+        "Netas por $60.000.000, para ser coherentes con la presentación del balance",
+        "Solo la compra neta de $60.000.000, revelando la subvención en las notas",
+        "Como una sola partida de inversión, porque la subvención se dedujo del activo"
+      ],
+      explicacion: "La compra de activos y el cobro de las subvenciones relacionadas se revelan con frecuencia como partidas separadas en el estado de flujos de efectivo, para mostrar la inversión bruta. Esto se hace con independencia de si la subvención se deduce del activo en el estado de situación financiera (párr. 28)." },
+
+    /* ---------- Nivel 5. Devolución y revelación ---------- */
+    { nivel: 4,
+      enunciado: "Al cierre del año 2 la cooperativa debe devolver los $40.000.000 de la máquina. Usa el método de deducción del activo y la máquina vale $48.000.000 en libros. ¿Qué registra?",
+      opciones: [
+        "Aumenta la máquina en $40.000.000 y reconoce de inmediato $8.000.000 de depreciación adicional",
+        "Aumenta la máquina en $40.000.000 y reparte la mayor depreciación en los años que faltan",
+        "Reconoce un gasto de $40.000.000, porque la máquina ya está registrada por su costo neto",
+        "Aumenta la máquina en $40.000.000 y reconoce $8.000.000 en otro resultado integral"
+      ],
+      explicacion: "La devolución de una subvención relacionada con un activo aumenta su importe en libros (o reduce el ingreso diferido). La depreciación acumulada adicional que se habría reconocido sin la subvención, 4.000.000 por 2 años = $8.000.000, va de inmediato al resultado del periodo (párr. 32). La máquina sube a 88.000.000 y queda en 80.000.000, igual que con el ingreso diferido. Además, debe evaluarse un posible deterioro (párr. 33).",
+      tabla: "T12" },
+    { nivel: 4,
+      enunciado: "De una subvención de $5.000.000 para una capacitación de dos años, al cierre del año 1 se habían llevado $3.000.000 a resultados y quedaba un ingreso diferido de $2.000.000. Por incumplir, debe devolverse todo. ¿Qué se reconoce?",
+      opciones: [
+        "$3.000.000 en el resultado del periodo, tras aplicar el diferido de $2.000.000, sin reexpresar años anteriores",
+        "Una corrección de error: se reexpresa el año anterior por los $3.000.000 ya reconocidos",
+        "$5.000.000 en resultados, y el diferido de $2.000.000 se sigue amortizando hasta agotarse",
+        "$3.000.000 contra resultados acumulados en el patrimonio, sin pasar por el resultado"
+      ],
+      explicacion: "Una subvención reembolsable se contabiliza como un cambio en una estimación contable, no como un error, así que no se reexpresan periodos anteriores (párr. 32). En las subvenciones relacionadas con los ingresos, la devolución se aplica primero al importe diferido no amortizado, 2.000.000, y el exceso, 5.000.000 − 2.000.000 = $3.000.000, se reconoce de inmediato en resultados." },
+    { nivel: 4,
+      enunciado: "Además de la subvención de la máquina, la cooperativa recibió asistencia técnica gratuita del gobierno, a la que no es posible asignar un valor. ¿Cuál de estas revelaciones exige la NIC 20?",
+      opciones: [
+        "Una indicación de las otras ayudas gubernamentales de las que se benefició directamente",
+        "El valor razonable estimado de la asistencia técnica, para hacerla comparable",
+        "Solo las subvenciones reconocidas, porque las ayudas sin valor no se revelan",
+        "Las condiciones incumplidas, pero solo cuando la subvención ya se haya devuelto"
+      ],
+      explicacion: "Se debe revelar la política contable y los métodos de presentación, la naturaleza y el alcance de las subvenciones reconocidas, una indicación de otras ayudas de las que la entidad se benefició directamente, y las condiciones incumplidas y otras contingencias (párr. 39). La asistencia técnica no se valora (párr. 35), pero su naturaleza, alcance y duración pueden requerir revelación (párr. 36). Las condiciones incumplidas se revelan aunque no se haya devuelto nada." }
+  ];
+
+  var VIDAS_INICIALES = 3;
+  var CLAVE_MEJOR = "nic20_mejor_puntaje";
+  var CLAVE_NOMBRE = "nic20_nombre";
+  var CLAVE_TABLA = "nic20_tabla_local";
+  var MAX_FILAS = 20;
+
+  var estado = null;
+  var jugador = "";
+
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------- Almacenamiento local ---------- */
+  function leer(clave) {
+    try { return window.localStorage.getItem(clave); } catch (e) { return null; }
+  }
+  function escribir(clave, valor) {
+    try { window.localStorage.setItem(clave, valor); return true; } catch (e) { return false; }
+  }
+  function leerMejor() {
+    var n = parseInt(leer(CLAVE_MEJOR), 10);
+    return isFinite(n) && n > 0 ? n : 0;
+  }
+  function leerTablaLocal() {
+    try {
+      var datos = JSON.parse(leer(CLAVE_TABLA) || "[]");
+      return Array.isArray(datos) ? datos : [];
+    } catch (e) { return []; }
+  }
+  function guardarEnTablaLocal(fila) {
+    var tabla = leerTablaLocal();
+    tabla.push(fila);
+    tabla.sort(ordenar);
+    escribir(CLAVE_TABLA, JSON.stringify(tabla.slice(0, 50)));
+  }
+  function ordenar(a, b) { return (b.puntaje - a.puntaje) || (b.aciertos - a.aciertos); }
+
+  /* Mejor resultado por nombre, para que cada persona aparezca una vez. */
+  function mejorPorNombre(filas) {
+    var mapa = {};
+    filas.forEach(function (f) {
+      var k = String(f.nombre || "").trim().toLowerCase();
+      if (!k) return;
+      if (!mapa[k] || ordenar(f, mapa[k]) < 0) mapa[k] = f;
+    });
+    return Object.keys(mapa).map(function (k) { return mapa[k]; }).sort(ordenar).slice(0, MAX_FILAS);
+  }
+
+  /* ---------- Tabla compartida (Google Apps Script) ---------- */
+  function pedir(params) {
+    var url = URL_TABLA + (URL_TABLA.indexOf("?") === -1 ? "?" : "&") + params;
+    var control = typeof AbortController === "function" ? new AbortController() : null;
+    var temporizador = setTimeout(function () { if (control) control.abort(); }, 10000);
+    return fetch(url, { method: "GET", signal: control ? control.signal : undefined })
+      .then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); })
+      .then(function (d) {
+        clearTimeout(temporizador);
+        if (!d || !Array.isArray(d.top)) throw new Error("formato");
+        return d.top.map(function (f) {
+          return {
+            nombre: String(f.nombre || ""),
+            puntaje: Number(f.puntaje) || 0,
+            aciertos: Number(f.aciertos) || 0,
+            respondidos: Number(f.respondidos) || 0
+          };
+        });
+      }, function (err) { clearTimeout(temporizador); throw err; });
+  }
+
+  /* Devuelve una promesa con {filas, compartida, error}. */
+  function obtenerTabla(nuevaFila) {
+    if (!URL_TABLA) {
+      return Promise.resolve({ filas: mejorPorNombre(leerTablaLocal()), compartida: false, error: false });
+    }
+    var params = "accion=leer&t=" + Date.now();
+    if (nuevaFila) {
+      params = "accion=guardar" +
+        "&nombre=" + encodeURIComponent(nuevaFila.nombre) +
+        "&puntaje=" + nuevaFila.puntaje +
+        "&aciertos=" + nuevaFila.aciertos +
+        "&respondidos=" + nuevaFila.respondidos +
+        "&t=" + Date.now();
+    }
+    return pedir(params).then(function (filas) {
+      return { filas: filas.sort(ordenar).slice(0, MAX_FILAS), compartida: true, error: false };
+    }).catch(function () {
+      return { filas: mejorPorNombre(leerTablaLocal()), compartida: false, error: true };
+    });
+  }
+
+  function pintarTabla(contId, notaId, resultado) {
+    var cont = $(contId);
+    var nota = $(notaId);
+    cont.innerHTML = "";
+    if (resultado.compartida) {
+      nota.textContent = "Mejores puntajes de todos los jugadores (uno por nombre).";
+    } else if (resultado.error) {
+      nota.textContent = "No se pudo conectar con la tabla compartida. Se muestran los puntajes de este dispositivo.";
+    } else {
+      nota.textContent = "Puntajes jugados en este dispositivo.";
+    }
+
+    if (!resultado.filas.length) {
+      var vacio = document.createElement("p");
+      vacio.className = "vacio";
+      vacio.textContent = "Aún no hay puntajes. Termina una partida para aparecer aquí.";
+      cont.appendChild(vacio);
+      return;
+    }
+
+    var envoltura = document.createElement("div");
+    envoltura.className = "tabla-contenedor tabla-puntajes";
+    var tabla = document.createElement("table");
+    var cap = document.createElement("caption");
+    cap.className = "oculto";
+    cap.textContent = "Tabla de puntajes";
+    tabla.appendChild(cap);
+    var thead = document.createElement("thead");
+    var trh = document.createElement("tr");
+    [["#", "num"], ["Nombre", ""], ["Puntaje", "num"], ["Aciertos", "num"]].forEach(function (c) {
+      var th = document.createElement("th");
+      th.scope = "col";
+      th.textContent = c[0];
+      if (c[1]) th.className = c[1];
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    tabla.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    var yo = jugador.trim().toLowerCase();
+    resultado.filas.forEach(function (f, i) {
+      var tr = document.createElement("tr");
+      var esYo = yo && f.nombre.trim().toLowerCase() === yo;
+      if (esYo) tr.className = "yo";
+      var c1 = document.createElement("td"); c1.className = "num";
+      var ins = document.createElement("span");
+      ins.className = "insignia" + (i < 3 ? " p" + (i + 1) : "");
+      ins.textContent = String(i + 1);
+      c1.appendChild(ins);
+      var c2 = document.createElement("th"); c2.scope = "row"; c2.textContent = f.nombre + (esYo ? " (tú)" : "");
+      var c3 = document.createElement("td"); c3.className = "num"; c3.textContent = String(f.puntaje);
+      var c4 = document.createElement("td"); c4.className = "num"; c4.textContent = f.aciertos + " de " + (f.respondidos || CASOS.length);
+      tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3); tr.appendChild(c4);
+      tbody.appendChild(tr);
+    });
+    tabla.appendChild(tbody);
+    envoltura.appendChild(tabla);
+    cont.appendChild(envoltura);
+  }
+
+  function cargarTabla(contId, notaId, nuevaFila) {
+    $(notaId).textContent = "Cargando la tabla de puntajes…";
+    return obtenerTabla(nuevaFila).then(function (r) { pintarTabla(contId, notaId, r); });
+  }
+
+  /* ---------- Juego ---------- */
+  function mezclar(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function puntosPorAcierto(rachaPrevia) { return 10 + 2 * Math.min(rachaPrevia, 5); }
+
+  function mostrar(id) {
+    ["pantalla-inicio", "pantalla-caso", "pantalla-resultados"].forEach(function (p) {
+      $(p).hidden = (p !== id);
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function enfocar(el) {
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+  }
+
+  function pantallaInicio() {
+    $("num-casos").textContent = String(CASOS.length);
+    $("mejor-inicio").textContent = String(leerMejor());
+    var guardado = leer(CLAVE_NOMBRE);
+    if (guardado && !$("nombre").value) $("nombre").value = guardado;
+    $("nombre-error").hidden = true;
+    mostrar("pantalla-inicio");
+    cargarTabla("tabla-inicio", "tabla-inicio-nota");
+  }
+
+  function limpiarNombre(texto) {
+    return String(texto || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 30);
+  }
+
+  function enviarInicio(ev) {
+    ev.preventDefault();
+    var nombre = limpiarNombre($("nombre").value);
+    if (!nombre) {
+      $("nombre-error").hidden = false;
+      $("nombre").setAttribute("aria-invalid", "true");
+      enfocar($("nombre"));
+      return;
+    }
+    $("nombre").removeAttribute("aria-invalid");
+    $("nombre-error").hidden = true;
+    jugador = nombre;
+    escribir(CLAVE_NOMBRE, nombre);
+    comenzar();
+  }
+
+  function comenzar() {
+    estado = {
+      indice: 0,
+      vidas: VIDAS_INICIALES,
+      puntaje: 0,
+      racha: 0,
+      aciertos: 0,
+      respondidos: 0,
+      ordenes: CASOS.map(function (c) {
+        return mezclar(c.opciones.map(function (_, i) { return i; }));
+      })
+    };
+    mostrar("pantalla-caso");
+    renderCaso();
+  }
+
+  function renderBarras() {
+    var caso = CASOS[estado.indice];
+    $("info-nivel").textContent = "Nivel " + (caso.nivel + 1) + " · " + NIVELES[caso.nivel];
+    $("info-caso").textContent = "Caso " + (estado.indice + 1) + " de " + CASOS.length;
+    $("barra-progreso").style.width = ((estado.respondidos / CASOS.length) * 100) + "%";
+    $("info-vidas-texto").textContent = "Vidas: " + estado.vidas + " de " + VIDAS_INICIALES;
+    var vidas = $("info-vidas");
+    vidas.innerHTML = "";
+    for (var i = 0; i < VIDAS_INICIALES; i++) {
+      var v = document.createElement("span");
+      v.className = "vida" + (i < estado.vidas ? "" : " perdida");
+      vidas.appendChild(v);
+    }
+    $("info-puntaje").textContent = String(estado.puntaje);
+    var racha = $("info-racha");
+    racha.hidden = estado.racha < 2;
+    racha.textContent = "Racha: " + estado.racha + " aciertos seguidos";
+  }
+
+  function renderCaso() {
+    var caso = CASOS[estado.indice];
+    renderBarras();
+    $("titulo-caso").textContent = "Caso " + (estado.indice + 1);
+    $("enunciado").textContent = caso.enunciado;
+
+    var cont = $("opciones");
+    cont.innerHTML = "";
+    estado.ordenes[estado.indice].forEach(function (idxOpcion) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "opcion";
+      b.setAttribute("data-opcion", String(idxOpcion));
+      var etiqueta = document.createElement("span");
+      etiqueta.className = "etiqueta";
+      etiqueta.hidden = true;
+      var texto = document.createElement("span");
+      texto.textContent = caso.opciones[idxOpcion];
+      b.appendChild(etiqueta);
+      b.appendChild(texto);
+      b.addEventListener("click", function () { responder(idxOpcion); });
+      cont.appendChild(b);
+    });
+
+    $("retro").hidden = true;
+    $("retro").className = "tarjeta retro";
+    $("retro-tabla").innerHTML = "";
+    enfocar($("titulo-caso"));
+  }
+
+  function construirTabla(id, numeroCaso) {
+    var datos = TABLAS[id];
+    var envoltura = document.createElement("div");
+    envoltura.className = "tabla-contenedor tabla-caso";
+    envoltura.setAttribute("role", "region");
+    envoltura.setAttribute("tabindex", "0");
+    envoltura.setAttribute("aria-label", "Tabla del caso " + numeroCaso + ", desplazable horizontalmente");
+
+    var tabla = document.createElement("table");
+    var cap = document.createElement("caption");
+    if (datos.titulo) {
+      cap.textContent = datos.titulo;
+    } else {
+      cap.textContent = "Tabla del caso " + numeroCaso;
+      cap.className = "oculto";
+    }
+    tabla.appendChild(cap);
+
+    var thead = document.createElement("thead");
+    var trh = document.createElement("tr");
+    var esNumero = function (c) { return /^[\d.()—]+$/.test(c); };
+    datos.cabeceras.forEach(function (h, i) {
+      var th = document.createElement("th");
+      th.scope = "col";
+      th.textContent = h;
+      var numerica = i > 0 && datos.filas.every(function (f) { return esNumero(f[i]); });
+      if (numerica) th.className = "num";
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    tabla.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    datos.filas.forEach(function (fila) {
+      var tr = document.createElement("tr");
+      fila.forEach(function (celda, i) {
+        var el;
+        if (i === 0) {
+          el = document.createElement("th");
+          el.scope = "row";
+        } else {
+          el = document.createElement("td");
+          if (esNumero(celda)) el.className = "num";
+        }
+        el.textContent = celda;
+        tr.appendChild(el);
+      });
+      tbody.appendChild(tr);
+    });
+    tabla.appendChild(tbody);
+    envoltura.appendChild(tabla);
+    return envoltura;
+  }
+
+  function responder(idxElegida) {
+    var caso = CASOS[estado.indice];
+    var acierto = (idxElegida === 0);
+    var ganados = 0;
+
+    estado.respondidos++;
+    if (acierto) {
+      ganados = puntosPorAcierto(estado.racha);
+      estado.puntaje += ganados;
+      estado.racha++;
+      estado.aciertos++;
+    } else {
+      estado.racha = 0;
+      estado.vidas--;
+    }
+
+    var botones = $("opciones").querySelectorAll("button.opcion");
+    Array.prototype.forEach.call(botones, function (b) {
+      var idx = parseInt(b.getAttribute("data-opcion"), 10);
+      b.disabled = true;
+      var etiqueta = b.querySelector(".etiqueta");
+      if (idx === 0) {
+        b.classList.add("correcta");
+        etiqueta.textContent = "Correcta:";
+        etiqueta.hidden = false;
+      } else if (idx === idxElegida) {
+        b.classList.add("incorrecta");
+        etiqueta.textContent = "Tu respuesta, incorrecta:";
+        etiqueta.hidden = false;
+      } else {
+        b.classList.add("atenuada");
+      }
+    });
+
+    renderBarras();
+
+    var retro = $("retro");
+    retro.classList.add(acierto ? "bien" : "mal");
+    $("retro-titulo").textContent = acierto
+      ? "Respuesta correcta: +" + ganados + " puntos"
+      : "Respuesta incorrecta: pierdes una vida";
+    $("retro-explicacion").textContent = caso.explicacion;
+    var contTabla = $("retro-tabla");
+    contTabla.innerHTML = "";
+    if (caso.tabla) contTabla.appendChild(construirTabla(caso.tabla, estado.indice + 1));
+
+    var fin = (estado.vidas <= 0) || (estado.indice === CASOS.length - 1);
+    $("btn-siguiente").textContent = fin ? "Ver resultados" : "Siguiente caso";
+    retro.hidden = false;
+    enfocar($("retro-titulo"));
+    try { retro.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) {}
+  }
+
+  function siguiente() {
+    if (estado.vidas <= 0 || estado.indice === CASOS.length - 1) {
+      resultados();
+    } else {
+      estado.indice++;
+      renderCaso();
+    }
+  }
+
+  function resultados() {
+    var caso = CASOS[estado.indice];
+    var completo = estado.vidas > 0;
+    var mensaje = completo
+      ? "Completaste los " + CASOS.length + " casos de la auditoría."
+      : "Se agotaron las vidas en el nivel " + (caso.nivel + 1) + " (" + NIVELES[caso.nivel] + ").";
+
+    var anterior = leerMejor();
+    var nuevo = estado.puntaje > anterior;
+    var mejor = anterior;
+    if (nuevo) {
+      escribir(CLAVE_MEJOR, String(estado.puntaje));
+      mejor = estado.puntaje;
+    }
+
+    $("titulo-resultados").textContent = (completo ? "Auditoría terminada, " : "Fin de la partida, ") + jugador;
+    $("res-mensaje").textContent = mensaje;
+    $("res-puntaje").textContent = String(estado.puntaje);
+    $("res-grande").textContent = String(estado.puntaje);
+    $("res-aciertos").textContent = estado.aciertos + " de " + estado.respondidos;
+    $("res-mejor").textContent = String(mejor);
+    $("res-nuevo").hidden = !nuevo;
+
+    var fila = {
+      nombre: jugador,
+      puntaje: estado.puntaje,
+      aciertos: estado.aciertos,
+      respondidos: estado.respondidos,
+      fecha: new Date().toISOString()
+    };
+    guardarEnTablaLocal(fila);
+
+    mostrar("pantalla-resultados");
+    enfocar($("titulo-resultados"));
+    cargarTabla("tabla-res", "tabla-res-nota", fila);
+  }
+
+  $("form-inicio").addEventListener("submit", enviarInicio);
+  $("btn-siguiente").addEventListener("click", siguiente);
+  $("btn-reiniciar").addEventListener("click", comenzar);
+  $("btn-inicio").addEventListener("click", pantallaInicio);
+  $("btn-actualizar-inicio").addEventListener("click", function () { cargarTabla("tabla-inicio", "tabla-inicio-nota"); });
+  $("btn-actualizar-res").addEventListener("click", function () { cargarTabla("tabla-res", "tabla-res-nota"); });
+
+  pantallaInicio();
+})();
+</script>
+</body>
+</html>
